@@ -1,0 +1,7 @@
+*.iml
+*.jar
+target
+.idea
+/node_modules/
+/dist/
+/app/css/
