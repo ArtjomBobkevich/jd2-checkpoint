@@ -1,7 +1,8 @@
 *.iml
 *.jar
-target
+**/target
 .idea
 /node_modules/
 /dist/
 /app/css/
+*.class
