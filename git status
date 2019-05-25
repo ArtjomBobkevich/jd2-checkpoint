@@ -1,0 +1,38 @@
+[33mcommit f96ef98d13cd4007bf6b15e0f5c13042d3ab2c51[m[33m ([m[1;36mHEAD -> [m[1;32mcp2[m[33m, [m[1;32mcontrol_point_2[m[33m)[m
+Author: ArtjomBobkevich <wassax@yandex.ru>
+Date:   Sat May 25 22:44:29 2019 +0300
+
+    cp2
+
+[33mcommit 4cbcee249a4a04122e4fa3f446d1d6cf6b1ce4f8[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Merge: 584923d 8b4ce7a
+Author: ArtjomBobkevich <46691828+ArtjomBobkevich@users.noreply.github.com>
+Date:   Fri May 10 13:24:46 2019 +0200
+
+    Merge pull request #1 from ArtjomBobkevich/CP1
+    
+    control point №1
+
+[33mcommit 8b4ce7a4ca891a5dcf39b2eedfb97119ad52d559[m[33m ([m[1;31morigin/CP1[m[33m)[m
+Author: ArtjomBobkevich <wassax@yandex.ru>
+Date:   Sat May 4 09:49:02 2019 +0300
+
+    cp1
+
+[33mcommit 584923dab16797d920294636888b4340116cbcbd[m
+Author: ArtjomBobkevich <wassax@yandex.ru>
+Date:   Sat May 4 09:37:03 2019 +0300
+
+    update gitignore
+
+[33mcommit c1c78815ffa0f75caec44d2f291b79d11d080fa8[m
+Author: ArtjomBobkevich <wassax@yandex.ru>
+Date:   Tue Apr 30 14:51:33 2019 +0300
+
+    gitignoge
+
+[33mcommit 7434597af5d45ce683316268ff6a0cf5f1b76ad4[m
+Author: ArtjomBobkevich <46691828+ArtjomBobkevich@users.noreply.github.com>
+Date:   Tue Apr 30 14:44:32 2019 +0300
+
+    Initial commit
