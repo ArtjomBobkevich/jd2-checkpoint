@@ -18,26 +18,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@ToString(exclude = "personList")
+@ToString(exclude = {"headings"})
 @EqualsAndHashCode(exclude = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "person_role", schema = "flea_market")
-public class PersonRole implements BaseEntity<Long> {
+@Table(name = "category", schema = "flea_market")
+public class Category implements BaseEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "role", unique = true, nullable = false)
-    private String nameOfRole;
+    @Column(name = "category_name", unique = true, nullable = false)
+    private String categoryName;
 
-    @OneToMany(mappedBy = "personRole")
-    private List<Person> personList = new ArrayList<>();
+    @Column(name = "foto")
+    private String fotoUrl;
 
-    public PersonRole(String nameOfRole) {
-        this.nameOfRole = nameOfRole;
+    @OneToMany(mappedBy = "category")
+    private List<Heading> headings = new ArrayList<>();
+
+    public Category(String categoryName, String fotoUrl) {
+        this.categoryName = categoryName;
+        this.fotoUrl = fotoUrl;
     }
 }
