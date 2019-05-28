@@ -1,4 +1,6 @@
-﻿SET SEARCH_PATH = flea_market;
+﻿CREATE SCHEMA flea_market;
+
+SET SEARCH_PATH = flea_market;
 
 CREATE TABLE person_role (
   id   SERIAL PRIMARY KEY,
@@ -8,7 +10,7 @@ CREATE TABLE person_role (
 CREATE TABLE person (
   id         SERIAL PRIMARY KEY,
   avatar     VARCHAR(1024),
-  login      VARCHAR(124) UNIQUE,
+  login      VARCHAR(124) UNIQUE NOT NULL,
   first_name VARCHAR(124)        NOT NULL,
   last_name  VARCHAR(124)        NOT NULL,
   age        SMALLINT            NOT NULL,
@@ -36,8 +38,11 @@ CREATE TABLE resource (
   heading_id    INTEGER REFERENCES heading (id) ON DELETE CASCADE ON UPDATE CASCADE,
   category_id   INTEGER REFERENCES category (id) ON DELETE CASCADE ON UPDATE CASCADE,
   author        VARCHAR(124) REFERENCES person (login) ON DELETE CASCADE ON UPDATE CASCADE,
-  price         INTEGER
+  price         INTEGER,
+  text          VARCHAR(1024) NOT NULL
 );
+
+DROP TABLE resource;
 
 CREATE TABLE resource_person (
   resources_id INTEGER REFERENCES resource (id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -46,13 +51,17 @@ CREATE TABLE resource_person (
 );
 
 CREATE TABLE store_basket (
+  foto   VARCHAR(124) NOT NULL ,
   person_id    INTEGER REFERENCES person (id) ON DELETE CASCADE ON UPDATE CASCADE,
   resources_id INTEGER REFERENCES resource (id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY (person_id,resources_id)
 );
 
+DROP TABLE store_basket;
+
 CREATE TABLE comment (
   id          SERIAL PRIMARY KEY,
+  person_id    INTEGER REFERENCES person (id) ON DELETE CASCADE ON UPDATE CASCADE,
   resource_id INTEGER REFERENCES resource (id) ON DELETE CASCADE ON UPDATE CASCADE,
   text        VARCHAR(500)
 );
