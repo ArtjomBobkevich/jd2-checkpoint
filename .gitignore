@@ -6,3 +6,5 @@
 /dist/
 /app/css/
 *.class
+checkstyle.xml
+log4j.log
