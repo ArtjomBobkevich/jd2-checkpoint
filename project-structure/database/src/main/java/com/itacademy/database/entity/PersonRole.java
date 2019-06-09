@@ -24,6 +24,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
+
 @Table(name = "person_role", schema = "flea_market")
 public class PersonRole implements BaseEntity<Long> {
 

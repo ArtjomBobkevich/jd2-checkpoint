@@ -1,10 +1,12 @@
 package com.itacademy.web.servlet;
 
 import com.itacademy.database.entity.Identification;
-import com.itacademy.database.entity.PersonRole;
 import com.itacademy.service.dto.CreateNewPersonDto;
 import com.itacademy.service.service.PersonService;
+import com.itacademy.service.service.RoleService;
+import com.itacademy.web.util.Filter;
 import com.itacademy.web.util.JspPath;
+import org.springframework.context.ApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,12 +14,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 @WebServlet(value = "/person-save", name = "PersonSaveServlet")
 public class PersonSaveServlet extends HttpServlet {
 
-    private PersonService personService = PersonService.getPersonService();
+    private Filter filter = Filter.getFILTER();
+
+    private ApplicationContext applicationContext = BaseServlet.getApplicationContext();
+    private PersonService personService = applicationContext.getBean(PersonService.class);
+    private RoleService roleService = applicationContext.getBean(RoleService.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -28,7 +33,7 @@ public class PersonSaveServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        filter.addFilter(req);
         CreateNewPersonDto createNewGenreDto = CreateNewPersonDto.builder()
                 .avatar(req.getParameter("avatar"))
                 .login(req.getParameter("login"))
@@ -36,16 +41,13 @@ public class PersonSaveServlet extends HttpServlet {
                         .firstName(req.getParameter("firstName"))
                         .lastName(req.getParameter("lastName"))
                         .build())
-                .age(Integer.parseInt(req.getParameter(req.getParameter("age"))))
+                .age(Integer.parseInt(req.getParameter("age")))
                 .mail(req.getParameter("mail"))
                 .password(req.getParameter("password"))
-                .personRole(PersonRole.builder()
-                        .id(2L)
-                        .nameOfRole("User")
-                        .build())
+                .personRole(roleService.findById(2L))
                 .build();
 
-        personService.savePerson(createNewGenreDto);
-        resp.sendRedirect("/person");
+        Long aLong = personService.savePerson(createNewGenreDto);
+        resp.sendRedirect("/person-info?id=" + aLong);
     }
 }

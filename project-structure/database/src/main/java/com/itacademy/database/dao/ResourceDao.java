@@ -1,70 +1,33 @@
 package com.itacademy.database.dao;
 
-import com.itacademy.database.entity.*;
-import com.itacademy.database.util.SessionManager;
+import com.itacademy.database.entity.BlockResource;
+import com.itacademy.database.entity.BlockResource_;
+import com.itacademy.database.entity.Category;
+import com.itacademy.database.entity.Category_;
+import com.itacademy.database.entity.ProxyPredicate;
+import lombok.Cleanup;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class ResourceDao implements BaseDao<Long, Resource> {
+@Repository
+public class ResourceDao extends BaseDaoImpl<Long, BlockResource> {
 
-    private static final ResourceDao RESOURCE_DAO = new ResourceDao();
-    private static SessionFactory factory = SessionManager.getFactory();
+    public List<BlockResource> findResourcesOrderByAuthor(ProxyPredicate proxyPredicate, Integer offset, Integer limit) {
 
-    public List<Resource> findResourcesOrderByAuthor(String resourceName, int offset, int limit) {
-        Session session = factory.openSession();
+        @Cleanup Session session = getSessionFactory().openSession();
         CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<Resource> criteria = cb.createQuery(Resource.class);
-        Root<Resource> root = criteria.from(Resource.class);
-        criteria.select(root).where(
-                cb.equal(root.get(Resource_.resourceName), resourceName)
-        )
-                .orderBy(
-                        cb.asc(root.get(Resource_.resourceName))
-                );
-        return session.createQuery(criteria)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .list();
-    }
-
-    public List<Resource> findResourcesOrderByAuthor(String resourceName, String category, int offset, int limit) {
-        Session session = factory.openSession();
-        CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<Resource> criteria = cb.createQuery(Resource.class);
-        Root<Resource> root = criteria.from(Resource.class);
-//        Join<Resource, Person> personJoin = root.join(Resource_.person);
-        Join<Resource, Category> categoryJoin = root.join(Resource_.category);
-        criteria.select(root).where(
-                cb.equal(root.get(Resource_.resourceName), resourceName),
-                cb.equal(categoryJoin.get(Category_.categoryName), category)
-        ).orderBy(
-                cb.asc(root.get(Resource_.resourceName))
-        );
-        return session.createQuery(criteria)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .list();
-    }
-
-    public List<Resource> findResourcesOrderByAuthor(String resourceName, String category,Integer price,  int offset, int limit) {
-        Session session = factory.openSession();
-        CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<Resource> criteria = cb.createQuery(Resource.class);
-        Root<Resource> root = criteria.from(Resource.class);
-        Join<Resource, Category> categoryJoin = root.join(Resource_.category);
-        criteria.select(root).where(
-                cb.equal(root.get(Resource_.resourceName), resourceName),
-                cb.equal(categoryJoin.get(Category_.categoryName), category),
-                cb.equal(root.get(Resource_.price), price)
-        ).orderBy(
-                cb.asc(root.get(Resource_.resourceName))
-        );
+        CriteriaQuery<BlockResource> criteria = cb.createQuery(BlockResource.class);
+        Root<BlockResource> root = criteria.from(BlockResource.class);
+        criteria.select(root).where(build(cb, root, proxyPredicate));
 
         return session.createQuery(criteria)
                 .setFirstResult(offset)
@@ -72,7 +35,36 @@ public class ResourceDao implements BaseDao<Long, Resource> {
                 .list();
     }
 
-    public static ResourceDao getResourceDao() {
-        return RESOURCE_DAO;
+
+    public Predicate[] build(CriteriaBuilder cb, Root<BlockResource> root, ProxyPredicate proxyPredicate) {
+        List<Predicate> predicates = new ArrayList<>();
+        Join<BlockResource, Category> categoryJoin = root.join(BlockResource_.category);
+        if (!proxyPredicate.getResource().equals("") && !proxyPredicate.getCategory().equals("") && proxyPredicate.getPrice() != null) {
+            predicates.add(cb.equal(root.get(BlockResource_.resourceName), proxyPredicate.getResource()));
+            predicates.add(cb.equal(categoryJoin.get(Category_.categoryName), proxyPredicate.getCategory()));
+            predicates.add(cb.equal(root.get(BlockResource_.price), proxyPredicate.getPrice()));
+        } else if (!proxyPredicate.getResource().equals("") && !proxyPredicate.getCategory().equals("")) {
+            predicates.add(cb.equal(root.get(BlockResource_.resourceName), proxyPredicate.getResource()));
+            predicates.add(cb.equal(categoryJoin.get(Category_.categoryName), proxyPredicate.getCategory()));
+        } else if (!proxyPredicate.getResource().equals("")) {
+            predicates.add(cb.equal(root.get(BlockResource_.resourceName), proxyPredicate.getResource()));
+        } else if (!proxyPredicate.getCategory().equals("")) {
+            predicates.add(cb.equal(categoryJoin.get(Category_.categoryName), proxyPredicate.getCategory()));
+        } else if (proxyPredicate.getPrice() != null) {
+            predicates.add(cb.equal(root.get(BlockResource_.price), proxyPredicate.getPrice()));
+        }
+        System.out.println(Arrays.toString(predicates.toArray()));
+        return predicates.toArray(new Predicate[0]);
+    }
+
+    public Integer countPages(ProxyPredicate proxyPredicate, Integer limit) {
+        @Cleanup Session session = getSessionFactory().openSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<BlockResource> criteria = cb.createQuery(BlockResource.class);
+        Root<BlockResource> root = criteria.from(BlockResource.class);
+        criteria.select(root).where(build(cb, root, proxyPredicate));
+        List<BlockResource> allByCriteria = session.createQuery(criteria).list();
+
+        return allByCriteria.size() / limit;
     }
 }

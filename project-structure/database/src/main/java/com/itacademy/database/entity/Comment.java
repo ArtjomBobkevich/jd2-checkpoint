@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(exclude = "id")
 @Entity
 @Table(name = "comment", schema = "flea_market")
 public class Comment implements BaseEntity<Long> {

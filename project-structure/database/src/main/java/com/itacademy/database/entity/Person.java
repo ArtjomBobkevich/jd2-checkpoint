@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(exclude = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
