@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(exclude = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -56,10 +58,6 @@ public class Person implements BaseEntity<Long> {
     @JoinColumn(name = "role")
     private PersonRole personRole;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "resource_person", schema = "flea_market", joinColumns = @JoinColumn(name = "resources_id"),
-            inverseJoinColumns = @JoinColumn(name = "person_id"))
-    private List<Resource> resources = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "store_basket", schema = "flea_market", joinColumns = @JoinColumn(name = "resources_id"),

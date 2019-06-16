@@ -1,35 +1,27 @@
 package com.itacademy.database.dao;
 
+import com.itacademy.database.config.DatabaseConfigTest;
 import com.itacademy.database.entity.PersonRole;
-import com.itacademy.database.util.SessionManager;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.junit.AfterClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Serializable;
-
-import static org.junit.Assert.assertNotNull;
-
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = DatabaseConfigTest.class)
+@Transactional
 public class RoleDaoTest {
 
-    private static SessionFactory factory = SessionManager.getFactory();
-
-    private final RoleDao roleDao = RoleDao.getRoleDao();
-
-    @AfterClass
-    public static void clear() {
-        factory.close();
-    }
+    @Autowired
+    private RoleDao roleDao;
 
     @Test
     public void checkSaveFactory() {
-        Session session = factory.openSession();
-            session.getTransaction().begin();
-            PersonRole personRole = new PersonRole("test");
-            Serializable id = roleDao.save(personRole);
-            session.getTransaction().commit();
-            assertNotNull(id);
-        }
+        PersonRole role = PersonRole.builder()
+                .nameOfRole("test")
+                .build();
+        roleDao.save(role);
     }
-
+}

@@ -1,34 +1,40 @@
 package com.itacademy.database.dao;
 
+import com.itacademy.database.config.DatabaseConfigTest;
 import com.itacademy.database.entity.Identification;
 import com.itacademy.database.entity.Person;
 import com.itacademy.database.entity.PersonRole;
-import com.itacademy.database.util.SessionManager;
 import lombok.Cleanup;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = DatabaseConfigTest.class)
+@Transactional
 public class PersonDaoTest {
 
-    private static SessionFactory factory = SessionManager.getFactory();
-    private final PersonDao personDao = PersonDao.getPersonDao();
-
-
-//    @AfterClass
-//    public static void clear() {
-//        factory.close();
-//    }
+    @Autowired
+    private PersonDao personDao;
+    @Autowired
+    private RoleDao roleDao;
 
     @Test
     public void checkSaveEntity() {
-      @Cleanup Session session = factory.openSession();
-        PersonRole role = session.get(PersonRole.class, 2L);
+
+        PersonRole role = PersonRole.builder()
+                .nameOfRole("test")
+                .build();
+        roleDao.save(role);
         Person person = Person.builder()
-                .avatar("qwer")
+                .avatar("qwerqwe")
                 .login("1234")
                 .identification(Identification.builder()
                         .firstName("qqq")
@@ -37,7 +43,7 @@ public class PersonDaoTest {
                 .age(2)
                 .mail("wqeq")
                 .password("222233")
-                .personRole(role)
+                .personRole(roleDao.get(1L).orElse(null))
                 .build();
 
         personDao.save(person);
@@ -45,8 +51,8 @@ public class PersonDaoTest {
     }
 
     @Test
-    public void checkGetEntity () {
-        @Cleanup Session session = factory.openSession();
+    public void checkGetEntity() {
+        @Cleanup Session session = personDao.getSessionFactory().openSession();
         PersonRole role = session.get(PersonRole.class, 2L);
         Person person = Person.builder()
                 .avatar("qwer")
@@ -66,9 +72,11 @@ public class PersonDaoTest {
     }
 
     @Test
-    public void checkGetAll () {
-        @Cleanup Session session = factory.openSession();
-        PersonRole role = session.get(PersonRole.class, 2L);
+    public void checkGetAll() {
+        PersonRole role = PersonRole.builder()
+                .nameOfRole("test")
+                .build();
+        roleDao.save(role);
         Person person = Person.builder()
                 .avatar("qwer")
                 .login("1234")
@@ -83,13 +91,15 @@ public class PersonDaoTest {
                 .build();
 
         personDao.save(person);
-        assertTrue(personDao.getAll().size()>0);
+        assertTrue(personDao.getAll().size() > 0);
     }
 
     @Test
-    public void checkUpdate () {
-        @Cleanup Session session = factory.openSession();
-        PersonRole role = session.get(PersonRole.class, 2L);
+    public void checkUpdate() {
+        PersonRole role = PersonRole.builder()
+                .nameOfRole("test")
+                .build();
+        roleDao.save(role);
         Person person = Person.builder()
                 .avatar("qwer")
                 .login("1234")
@@ -107,13 +117,15 @@ public class PersonDaoTest {
         personDao.get(person.getId());
         person.setAge(3);
         personDao.update(person);
-        assertTrue(person.getAge()!=2);
+        assertTrue(person.getAge() != 2);
     }
 
     @Test
-    public void checkDelete () {
-        @Cleanup Session session = factory.openSession();
-        PersonRole role = session.get(PersonRole.class, 2L);
+    public void checkDelete() {
+        PersonRole role = PersonRole.builder()
+                .nameOfRole("test")
+                .build();
+        roleDao.save(role);
         Person person = Person.builder()
                 .avatar("qwer")
                 .login("1234")
