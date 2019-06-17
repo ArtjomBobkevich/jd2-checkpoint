@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class RoleDao extends BaseDaoImpl<Long, PersonRole> {
-
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -16,19 +17,22 @@ import javax.persistence.Entity;
 @DiscriminatorValue("block")
 public class BlockResource extends Resource {
 
-    private Long id;
     private String block;
 
-    public BlockResource(String resourceName, String foto, Heading heading, Category category, Person person,
+
+    public BlockResource(Long id, String resourceName, String foto, Category category, Person person,
                          Integer price, String text, String block) {
-        super(resourceName, foto, heading, category, person, price, text);
+        super(id, resourceName, foto, category, person, price, text);
         this.block = block;
     }
 
-    public BlockResource(String resourceName, String foto, Heading heading, Category category, Person person,
-                         Integer price, String text,Long id, String block) {
-        super( resourceName, foto, heading, category, person, price, text);
-        this.id = id;
+    public BlockResource(Set<Heading> headings) {
+        super(headings);
+
+    }
+
+    public BlockResource(String resourceName, String foto, Category category, Person person, Integer price, String text, String block) {
+        super(resourceName, foto, category, person, price, text);
         this.block = block;
     }
 }

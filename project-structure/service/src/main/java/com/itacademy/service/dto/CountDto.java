@@ -11,5 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CountDto {
 
-    private Integer count;
+    private Integer page;
+    private Integer prevPage;
+
+    public CountDto(Integer page) {
+        this.page = page;
+    }
 }

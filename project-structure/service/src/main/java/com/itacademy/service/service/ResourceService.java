@@ -2,9 +2,13 @@ package com.itacademy.service.service;
 
 import com.itacademy.database.dao.ResourceDao;
 import com.itacademy.database.entity.BlockResource;
-import com.itacademy.database.entity.ProxyPredicate;
+import com.itacademy.database.entity.FilterDto;
+import com.itacademy.database.entity.Heading;
+import com.itacademy.database.entity.Resource;
+import com.itacademy.service.dto.CountDto;
+import com.itacademy.service.dto.CreateHeadingDto;
 import com.itacademy.service.dto.CreateResourceDto;
-import com.itacademy.service.dto.PredicateDto;
+import com.itacademy.service.dto.FilterPredicateParametersDto;
 import com.itacademy.service.dto.ResourceFullDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +28,13 @@ public class ResourceService {
 
     public List<ResourceFullDto> findAll() {
         return resourceDao.getAll().stream()
-                .map(it -> new ResourceFullDto(it.getId(), it.getResourceName(), it.getFoto(), it.getHeading().getHeadingName(), it.getCategory().getCategoryName(),
+                .map(it -> new ResourceFullDto(it.getId(), it.getResourceName(), it.getFoto(), it.getCategory().getCategoryName(),
                         it.getPerson().getLogin(), it.getPrice(), it.getText(), it.getBlock()))
                 .collect(Collectors.toList());
     }
 
     public ResourceFullDto findById(Long id) {
-        return resourceDao.get(id).map(it -> new ResourceFullDto(it.getResourceName(), it.getFoto(), it.getHeading().getHeadingName(),
+        return resourceDao.get(id).map(it -> new ResourceFullDto(it.getResourceName(), it.getFoto(),
                 it.getCategory().getCategoryName(), it.getPerson().getLogin(), it.getPrice(), it.getText(), it.getBlock()))
                 .orElse(null);
     }
@@ -38,7 +42,7 @@ public class ResourceService {
     @Transactional
     public Long saveResource(CreateResourceDto createResource) {
 
-        return resourceDao.save(new BlockResource(createResource.getResourceName(), createResource.getFoto(), createResource.getHeading(),
+        return resourceDao.save(new BlockResource(createResource.getResourceName(), createResource.getFoto(),
                 createResource.getCategory(), createResource.getPerson(), createResource.getPrice(), createResource.getText(),
                 createResource.getBlock()));
     }
@@ -53,21 +57,35 @@ public class ResourceService {
         resourceDao.update(blockResource);
     }
 
-    public List<ResourceFullDto> findResourceByCriteria(PredicateDto predicateDto, Integer offset, Integer limit) {
-        ProxyPredicate proxyPredicate;
-        if (predicateDto.getPrice() != null) {
-            proxyPredicate = new ProxyPredicate(predicateDto.getResource(), predicateDto.getCategory(), predicateDto.getPrice());
-        } else
-            proxyPredicate = new ProxyPredicate(predicateDto.getResource(), predicateDto.getCategory());
+    public List<ResourceFullDto> findResourceByCriteria(FilterPredicateParametersDto filterParametersDto) {
+        FilterDto filterDto;
+        filterDto = new FilterDto(filterParametersDto.getResource(), filterParametersDto.getCategory(), filterParametersDto.getPrice());
 
-        return resourceDao.findResourcesOrderByAuthor(proxyPredicate, offset, limit).stream()
-                .map(it -> new ResourceFullDto(it.getResourceName(), it.getFoto(), it.getHeading().getHeadingName(), it.getCategory().getCategoryName(),
+        return resourceDao.findResourcesOrderByAuthor(filterDto, filterParametersDto.getOffset(), filterParametersDto.getLimit()).stream()
+                .map(it -> new ResourceFullDto(it.getResourceName(), it.getFoto(), it.getCategory().getCategoryName(),
                         it.getPerson().getLogin(), it.getPrice(), it.getText(), it.getBlock()))
                 .collect(Collectors.toList());
     }
 
-    public Integer countPages(PredicateDto predicateDto, Integer limit) {
-        ProxyPredicate proxyPredicate = new ProxyPredicate(predicateDto.getResource(), predicateDto.getCategory(), predicateDto.getPrice());
-        return resourceDao.countPages(proxyPredicate, limit);
+    public List<CountDto> countPages(FilterPredicateParametersDto filterPredicateParametersDto, int limit) {
+        FilterDto filterDto = new FilterDto(filterPredicateParametersDto.getResource(), filterPredicateParametersDto.getCategory(), filterPredicateParametersDto.getPrice());
+        return resourceDao.countPages(filterDto, limit).stream().map(it -> new CountDto(it.getCount())).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void addHeading(CreateHeadingDto createHeadingDto, CreateResourceDto createResourceDto) {
+        Resource resource = Resource.builder()
+                .id(createResourceDto.getId())
+                .resourceName(createResourceDto.getResourceName())
+                .foto(createResourceDto.getFoto())
+                .category(createResourceDto.getCategory())
+                .person(createResourceDto.getPerson())
+                .price(createResourceDto.getPrice())
+                .text(createResourceDto.getText())
+                .build();
+
+        Heading heading = new Heading(createHeadingDto.getId(), createHeadingDto.getHeadingName(), createHeadingDto.getCategory());
+
+        resourceDao.addHeading(heading, resource);
     }
 }
